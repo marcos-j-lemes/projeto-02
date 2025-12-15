@@ -1,230 +1,222 @@
-//variáveis globais
-var gridSizeX = 10;
-var gridSizeY = 10;
+// Variáveis Globais:
+const gridSizeX = 10;
+const gridSizeY = 10;
 
-var posicaoX = 0
-var posicaoY = 0
+var posicaoX = 9;
+var posicaoY = 4;
 
-var vidas = 5
+var vidas = 3;
 
-var rio = 1;
-var rios = [1, 3, 6, 8];
+var rios = [ 1, 3, 6, 8];
+var balsa = [ 2, 4, 6, 8 ];
+var direcao = [ 1, -1, 1, -1 ];
 
-var victoria = [1,3,6,8];
 
-//resgistro de eventos
+
+function setDefaults()
+{
+    posicaoX = 9;
+    posicaoY = 4;
+    vidas = 3;
+}
+
+// Registro de eventos:
 document.addEventListener('DOMContentLoaded', inicializaJogo);
-document.addEventListener('keydown', processaTecla)
+document.addEventListener('keydown', processaTecla);
 
+// Funções:
 
-//funções
-
-function removeVida(){
+function removeVida()
+{
     vidas--;
-
-    if(vidas == 0){
+    if (vidas == 0)
+    {
+        // TODO: Falta limpar o div "ambiente"
+        let ambiente = document.querySelector(".ambiente");
+        ambiente.innerHTML = "";
+        alert("Game over");
         inicializaJogo();
-    }else{
+    }
+    else
+    {
         atualizaVidas();
     }
 }
 
-function processaTecla(evento){
-    let posicaoAtual = document.querySelector('#bloco'+posicaoX+posicaoY);
+function processaTecla(evento)
+{
+    let atual = document.querySelector("#bloco"+posicaoX+posicaoY);
+    atual.classList.remove("vermelho");
 
-    if(evento.key == 'ArrowDown'){
-
-        let novaPosicao = document.querySelector('#bloco'+(posicaoX + 1) + posicaoY)
-
-        if(posicaoX < (gridSizeX -1) && !novaPosicao.classList.contains("azul")){
-            posicaoAtual.classList.remove('jogador');
-            novaPosicao.classList.add('jogador')
-            posicaoX++
-        }else{
-            posicaoAtual.classList.add('vermelho')
-            removeVida();
-        }
-
-    }else if(evento.key == 'ArrowRight'){
-
-        if(posicaoY < (gridSizeX - 1)){
-            let novaPosicao = document.querySelector('#bloco'+ posicaoX + (posicaoY +1))
-            posicaoAtual.classList.remove('jogador');
-            novaPosicao.classList.add('jogador')
-            posicaoY++;
-        }else{
-            posicaoAtual.classList.add('vermelho')
-            removeVida();
-            if ( vida <= 0){
-                alert("Fim de jogo");
-            }
-        }
-        // Corrigir essa parte;
-    }else if(evento.key == 'aa') {
-
-        if(posicaoX < (gridSizeX - 1)){
-            let novaPosicao = document.querySelector('#bloco' + posicaoY + (posicaoX - 1));
-            posicaoAtual.classList.remove('jogador');
-            novaPosicao.classList.add('jogador');
-            posicaoY++
-        } else {
-            posicaoAtual.classList.add('vermelho')
-            removeVida();
-        }
-        // a
-    }else if(evento.key == 'ArrowLeft'){
-
-        if(posicaoY < (gridSizeX - 1)){
-            let novaPosicao = document.querySelector('#bloco'+ posicaoX + (posicaoY - 1))
-            posicaoAtual.classList.remove('jogador');
-            novaPosicao.classList.add('jogador')
-            posicaoY--;
-        }else{
-            posicaoAtual.classList.add('vermelho')
-            removeVida();
-            if ( vida <= 0){
-                alert("Fim de jogo");
-            }
-        }
-    }else if(evento.key == 'Up'){
-        if(posicaoX < (gridSizeY - 1)) {
-            let novaPosicao = document.querySelector("#bloco"+posicaoX+(posicaoY));
-            atualizaVidas.classList.remove("jogador");
+    if (evento.key == "ArrowDown")
+    {
+        let novaPosicao = document.querySelector("#bloco"+(posicaoX+1)+posicaoY);
+        if (posicaoX < (gridSizeX-1) && !novaPosicao.classList.contains("azul"))
+        {
+            atual.classList.remove("jogador");
             novaPosicao.classList.add("jogador");
-            posicaoY += 1;
-        }else {
-            atualizaVidas.classList.add("vermelho");
+            posicaoX += 1;
+        }
+        else
+        {
+            atual.classList.add("vermelho");
             removeVida();
         }
     }
+    else if (evento.key == "ArrowRight")
+    {
+        let novaPosicao = document.querySelector("#bloco"+posicaoX+(posicaoY+1));
+        if (posicaoY < (gridSizeY-1) && !novaPosicao.classList.contains("azul"))
+        {
+            atual.classList.remove("jogador");
+            novaPosicao.classList.add("jogador");
+            posicaoY += 1;
+        }
+        else
+        {
+            atual.classList.add("vermelho");
+            removeVida();
+        }
+    }
+    else if (evento.key == "ArrowUp")
+    {
+        let novaPosicao = document.querySelector("#bloco"+(posicaoX-1)+posicaoY);
+        // Posso ir para a nova posição?
+        if (posicaoX > 0 && !novaPosicao.classList.contains("azul"))
+        {
+            atual.classList.remove("jogador");
+            novaPosicao.classList.add("jogador");
+            posicaoX -= 1;
+        }
+        else
+        {
+            atual.classList.add("vermelho");
+            removeVida();
+        }
 
-    // }else if(evento.key == 'up'){
-    //     if(posicaoX < (gridSizeY - 1)) {
-    //         let novaPosicao = document.querySelector("#bloco"+posicaoX+(posicaoY));
-    //         atualizaVidas.classList.remove("jogador");
-    //         novaPosicao.classList.add("jogador");
-    //         posicaoY += 1;
-    //     }else {
-    //         atualizaVidas.classList.add("vermelho");
-    //         removeVida();
-    //     }
-    // }else if (evento.key == "ArrowRight"){
-
-    //     if (posicaoY < (gridSizeX -1)) {
-    //         let novaPosicao = document.querySelector("#bloco"+posicaoX+(posicaoY+1));
-    //         atualizaVidas.classList.remove("jogador");
-    //         novaPosicao.classList.add("jogador");
-    //     }else {
-    //         posicaoAtual.classList.add('vermelho')
-    //         removeVida();
-    //     }
-    // }else if (evento.key == "ArrowLeft"){
-
-    //     if(posicaoX < (gridSizeY - 1)) {
-    //         let novaPosicao = document.querySelector("#bloco"+posicaoX+(posicaoY+1));
-    //         atualizaVidas.classList.remove("jogador");
-    //         novaPosicao.classList.add("jogador");
-    //         posicaoY += 1;
-    //     }else {
-    //         atualizaVidas.classList.add("vermelho");
-    //         removeVida();
-    //     }
-
-    //}
-
+    }
+    else if (evento.key == "ArrowLeft")
+    {
+        let novaPosicao = document.querySelector("#bloco"+posicaoX+(posicaoY-1));
+        if (posicaoY > 0 && !novaPosicao.classList.contains("azul"))
+        {
+            atual.classList.remove("jogador");
+            novaPosicao.classList.add("jogador");
+            posicaoY -= 1;
+        }
+        else
+        {
+            atual.classList.add("vermelho");
+            removeVida();
+        }
+    }
+    else
+    {
+        alert(evento.key);
+    }
 }
 
-function atualizaVidas(){
-    let spanVidas = document.querySelector('#lifes');
+function atualizaVidas()
+{
+    let spanVidas = document.querySelector("#vidas");
     spanVidas.innerText = vidas;
 }
 
-var c = 11;
-function inicializaJogo(){
+function inicializaJogo()
+{
+    setDefaults();
     criaGrid();
 
-    //Cria jogador
-    let jogador = document.querySelector('#bloco'+posicaoX+posicaoY);
-    jogador.classList.add('jogador');
+    // Criar jogador
+    let jogador = document.querySelector("#bloco"+posicaoX+posicaoY);
+    jogador.classList.add("jogador");
 
-    atualizaVidas();
-
-    // criar os rio;
-    rios.forEach(rio => {
-        for(let i = 0; i < gridSizeY; i++){
-            let elem = document.querySelector('#bloco' + rio+i);
+    // Criar rios
+    rios.forEach((rio, cont_rio) => {
+        for(let i = 0; i < gridSizeY; i++)
+        {
+            let elem = document.querySelector("#bloco"+rio+i);
             elem.classList.remove("cinza");
-            elem.classList.add("azul");
+            if (balsa[cont_rio] == i)
+                elem.classList.add("amarelo");
+            else
+                elem.classList.add("azul");
         }
     });
 
-// const randomIndex = Math.floor(Math.random() * arr.length);
-//  const item = arr[randomIndex];
-
-    // victoria.forEach(r => {
-        //     for(let i = 0; i < rios.length; i++) {
-            //         const numberRandom = Math.floor(Math.random() * rios.length);
-            //         const valor = rios[numberRandom];
-            
-    //         let elem = document.querySelector('#bloco' + valor + i);
-    //         elem.classList.remove('azul');
-    //         elem.classList.add('verde');
-    //     }
-    // })
-    
-    var a = document.querySelector('#bloco' + c);
-    a.classList.remove('azul');
-    a.classList.add('verde');
-    
-    setInterval(mover, 1000, a)
+    atualizaVidas();
 }
 
-function mover(a) {
-    
-    c++
-    for(let i = 0; i < 1; i++){
-        a.classList.remove('verde');
-        a.classList.add('azul');
-        
-        
-        a = document.querySelector('#bloco' + c)
-        a.classList.remove('verde')
-        a.classList.remove('azul');
-        a.classList.add('verde');
+function criaGrid()
+{
+    let ambiente = document.querySelector(".ambiente");
 
-    }
+    for(let x = 0; x < gridSizeX; x++)
+    {
+        for(let y = 0; y < gridSizeY; y++)
+        {
+            let divNovo = document.createElement("div");
+            divNovo.classList.add("bloco");
+            divNovo.classList.add("cinza");
+            divNovo.id = "bloco"+x+y;
+            // divNovo.innerText = ""+x+y;
 
-    return a
-
-}
-
-
-function criaGrid() {
-    let ambient = document.querySelector('.ambiente');
-
-    for( let x = 0; x < gridSizeX; x++) {
-        for (let y = 0; y < gridSizeY; y++) {
-            let divJogo = document.createElement('div');
-            divJogo.classList.add('bloco');
-            divJogo.classList.add('cinza');
-            divJogo.id = "bloco"+x+y;
-            divJogo.innerText = ""+x+y;
-
-            if (y == 0){
-                divJogo.classList.add('left');
+            if (y == 0)
+            {
+                divNovo.classList.add("left");
             }
-            if (x == 0){
-                divJogo.classList.add('top');
+            if (x == 0)
+            {
+                divNovo.classList.add("top");
             }
-            if(y == gridSizeY-1){
-                divJogo.classList.add('right');
+            if (y == gridSizeY-1)
+            {
+                divNovo.classList.add("right");
             }
-            if(x == gridSizeX-1){
-                divJogo.classList.add('bottom');
+            if (x == gridSizeX-1)
+            {
+                divNovo.classList.add("bottom");
             }
 
-
-            ambient.appendChild(divJogo);
+            ambiente.appendChild(divNovo);
         }
     }
+}
+
+setInterval(movimentaBalsas, 1000);
+
+function movimentaBalsas()
+{
+
+    let atual = document.querySelector("#bloco"+posicaoX+posicaoY);
+
+    rios.forEach((rio, index) => {
+        let balsaAtual = document.querySelector("#bloco"+rio+balsa[index]);
+        if (direcao[index] == 1)
+        {
+            balsa[index] += 1;
+            if (balsa[index] == gridSizeY-1)
+                direcao[index] = -1;
+        }
+        else
+        {
+            balsa[index] -= 1;
+            if (balsa[index] == 0)
+                direcao[index] = 1;
+        }
+        let balsaNova = document.querySelector("#bloco"+rio+(balsa[index]));
+
+        balsaAtual.classList.remove("amarelo");
+        balsaAtual.classList.add("azul");
+
+        if (balsaAtual.classList.contains("jogador")){
+            balsaAtual.classList.remove("jogador");
+            balsaNova.classList.add("jogador");
+            
+        }else if (!balsaAtual.classList.contains(jogador) && !balsaAtual.classList("jogador") ){
+            atual.classList.remove("jogador")    
+        }
+        balsaNova.classList.remove("azul");
+        balsaNova.classList.add("amarelo");
+    });
 }
