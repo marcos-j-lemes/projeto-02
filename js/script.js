@@ -1,24 +1,34 @@
 // Variáveis Globais:
-const spanVidas = document.getElementById('vidas');
 const gridSizeX = 10;
 const gridSizeY = 10;
 
 var posicaoX = 9;
 var posicaoY = 4;
 
+// configurações dos rios
 var rios = [ 1, 3, 8];
 var balsa = [ 2, 4, 6, 8 ];
 var direcao = [ 1, -1, 1, -1 ];
+let loopBalsas;
 
+// estrados e carros
 var estradas  = [6,5]; 
 var carros = [1,5];
 var direcaoCarros = [1, -1];
 
-var a = false;
+// vidas
+const spanVidas = document.getElementById('vidas');
+var getVidas = false;
 let vidas = 10;
-let loopBalsas;
+
+let vitorias = 0;
+
+// tempos;
+let tempo = 250;
+let tempoBuraco = 7000;
 
 
+// limpa todos setInterval ativos
 function iniciarLoop() {
     clearInterval(loopBalsas);
     loopBalsas = setInterval(movimentaBalsas, tempo);
@@ -37,24 +47,21 @@ function setDefaults()
 }
 
 
-let vitorias = 0;
-let tempo = 250;
-
-
 // Registro de eventos:
 document.addEventListener('DOMContentLoaded', inicializaJogo);
 document.addEventListener('keydown', processaTecla);
 
 // Funções:
-
 function removeVida()
 {
     vidas--;
     if (vidas == 0)
-    {
-        // TODO: Falta limpar o div "ambiente"
+    {   
+        // reinicia o jogo; limpa o ambiente
         let ambiente = document.querySelector(".ambiente");
         ambiente.innerHTML = "";
+        vitorias = 0;
+        tempo = 300;
         alert("Game over");
         inicializaJogo();
     }
@@ -64,8 +71,7 @@ function removeVida()
     }
 }
 
-
-
+// move a imagem para a direção das setas apertadas;
 function definirDirecao(elemento, direcao) {
     elemento.classList.remove(
         "dir-cima",
@@ -76,10 +82,9 @@ function definirDirecao(elemento, direcao) {
     elemento.classList.add(direcao);
 }
 
+// processa as teclas apertadas pelo usuário
 function processaTecla(evento)
 {
- 
-
     let atual = document.querySelector("#bloco"+posicaoX+posicaoY);
     atual.classList.remove("vermelho");
 
@@ -87,13 +92,12 @@ function processaTecla(evento)
     {
         definirDirecao(atual, "dir-baixo");
         let novaPosicao = document.querySelector("#bloco"+(posicaoX+1)+posicaoY);
-        if (posicaoX < (gridSizeX-1) && !novaPosicao.classList.contains("azul"))
+        if (posicaoX < (gridSizeX-1) && !novaPosicao.classList.contains("azul") && !novaPosicao.classList.contains("buraco"))
         {
             atual.classList.remove("jogador");
             novaPosicao.classList.add("jogador");
             definirDirecao(novaPosicao, "dir-baixo");
             posicaoX += 1;
-           // winGame();
         }
         else
         {
@@ -105,14 +109,12 @@ function processaTecla(evento)
     {
         definirDirecao(atual, "dir-direita");
         let novaPosicao = document.querySelector("#bloco"+posicaoX+(posicaoY+1));
-        if (posicaoY < (gridSizeY-1) && !novaPosicao.classList.contains("azul"))
+        if (posicaoY < (gridSizeY-1) && !novaPosicao.classList.contains("azul") && !novaPosicao.classList.contains("buraco"))
         {
             atual.classList.remove("jogador");
             novaPosicao.classList.add("jogador");
             definirDirecao(novaPosicao, "dir-direita");
             posicaoY += 1;
-           //winGame();
-
         }
         else
         {
@@ -124,13 +126,12 @@ function processaTecla(evento)
     {
         definirDirecao(atual, "dir-cima");
         let novaPosicao = document.querySelector("#bloco"+(posicaoX-1)+posicaoY);
-        if (posicaoX > 0 && !novaPosicao.classList.contains("azul"))
+        if (posicaoX > 0 && !novaPosicao.classList.contains("azul") && !novaPosicao.classList.contains("buraco"))
         {
             atual.classList.remove("jogador");
             novaPosicao.classList.add("jogador");
             definirDirecao(novaPosicao, "dir-cima");
             posicaoX -= 1;
-           // winGame();
         }
         else
         {
@@ -142,13 +143,12 @@ function processaTecla(evento)
     {
         definirDirecao(atual, "dir-esquerda");
         let novaPosicao = document.querySelector("#bloco"+posicaoX+(posicaoY-1));
-        if (posicaoY > 0 && !novaPosicao.classList.contains("azul"))
+        if (posicaoY > 0 && !novaPosicao.classList.contains("azul") && !novaPosicao.classList.contains("buraco"))
         {
             atual.classList.remove("jogador");
             novaPosicao.classList.add("jogador");
             definirDirecao(novaPosicao, "dir-esquerda");
             posicaoY -= 1;
-            //winGame();
         }
         else
         {
@@ -157,38 +157,37 @@ function processaTecla(evento)
         }
     }
 
-    
-    if ( a == false ){
+    // lógica para sortear o coração pelo mapa
+    if ( getVidas == false ){
         sorteiaCoracao();
-        a = true;
+        getVidas = true;
     }
     
-    if (a == true){
+    if (getVidas == true){
         pegarCoracao();
 
     }
 
-
+    // verifica se o jogador chegou na posição de vitória
     if (posicaoX == 0 && posicaoY == Math.floor(gridSizeY/2)){
         winGame();
     }
 }
 
-function atualizaVidas()
-{
+// atualiza o display de vidas
+function atualizaVidas() {
     spanVidas.innerText = "❤️".repeat(vidas);
-   // let spanVidas = document.querySelector("#vidas");
-    //spanVidas.innerText = vidas;
 }
 
-function inicializaJogo()
-{  
+function inicializaJogo() {  
 
+    // atualiza as vitórias
     vitoriasGame();
+    // limpa o ambiente
     let am = document.querySelector(".ambiente");
     am.innerHTML = "";
 
-    a = false;
+    getVidas = false;
     setDefaults();
     criaGrid();
     
@@ -224,7 +223,6 @@ function inicializaJogo()
 
     atualizaVidas();
     winGame();
-
 }
 
 function criaGrid()
@@ -239,7 +237,6 @@ function criaGrid()
             divNovo.classList.add("bloco");
             divNovo.classList.add("cinza");
             divNovo.id = "bloco"+x+y;
-            // divNovo.innerText = ""+x+y;
 
             if (y == 0)
             {
@@ -263,9 +260,8 @@ function criaGrid()
     }
 }
 
+// Inicia o loop de movimentação das balsas
 iniciarLoop();
-//setInterval(movimentaBalsas, tempo);
-//setInterval(movimentaBalsas, 1000);
 
 function movimentaBalsas()
 {
@@ -344,19 +340,17 @@ function movimentaBalsas()
     });
 }
 
-
+// função para verificar se o jogador venceu o jogo
 function winGame()
 {
     let blocoWin = document.querySelector("#bloco0"+Math.floor(gridSizeY/2));
-
-   // console.log("Verificando vitória na posição: ", blocoWin);
-   // blocoWin.classList.add("top");
     blocoWin.classList.remove("cinza");
     blocoWin.classList.add("verde");
 
     if (blocoWin.classList.contains("jogador"))
     {
-        alert("Parabéns! Você venceu o jogo!");
+        //alert("Parabéns! Você venceu o jogo!");
+        telaFinal();
         // Reinicia o jogo
         vitorias++;
         let ambiente = document.querySelector(".ambiente");
@@ -365,15 +359,19 @@ function winGame()
     }
 
     if (vitorias % 3 == 0 && tempo > 10)
-    {
-        tempo -= 50; // Aumenta a velocidade do jogo a cada 3 vitórias
-    }else if (vitorias == 5){
+        {
+        // Aumenta a velocidade do jogo a cada 3 vitórias, diminuindo o tempo; dos carros e balsas;
+        tempo -= 50; 
+        // Aumenta a velocidade do jogo a cada 3 vitórias; dos buracos;
+        tempoBuraco -= 2000; 
+        iniciarLoop();
+
+    }else if (vitorias === 3){
+        // reseta as vidas para uma, em 3 vitorias
         vidas = 1
+        atualizaVidas();
     };
-
-    console.log("Vitórias: ", vitorias, " Tempo: ", tempo);
 }
-
 
 // função para sortear um coração pelo mapa:
 function sorteiaCoracao()
@@ -385,19 +383,14 @@ function sorteiaCoracao()
     {
         bloco.classList.remove("cinza", "verde", "amarelo");
         bloco.classList.add("vidas", "vida-icon");
-        //  setTimeout(() => {
-        //     bloco.classList.remove("vidas");
-        //     bloco.classList.remove("vida-icon");
-        // }, 5000); // Remove o coração após 5 segundos
-
     }
 }
 
+// função para pegar o coração
 function pegarCoracao()
 {
     let blocoVidas = document.querySelector(".vidas");
-    if (blocoVidas && blocoVidas.classList.contains("jogador"))
-    {
+    if (blocoVidas && blocoVidas.classList.contains("jogador")) {
         vidas++;   
         atualizaVidas();
         blocoVidas.classList.remove("vidas");
@@ -406,7 +399,7 @@ function pegarCoracao()
         // remover o coração 
         blocoVidas.classList.remove("vida-icon");
         blocoVidas.classList.add("cinza");
-        a = false;
+        getVidas = false;
     }
 }
 
@@ -415,5 +408,39 @@ function pegarCoracao()
 function vitoriasGame(){
     let spanVitorias = document.getElementById('vitorias');
     spanVitorias.innerText = "🏆".repeat(vitorias);
-
+    //telaFinal();
 }
+
+// função para fazer um buraco no chão com passar do tempo
+function buracoNoChao() {
+
+    let x = Math.floor(Math.random() * gridSizeX);
+    let y = Math.floor(Math.random() * gridSizeY);
+    let bloco = document.querySelector("#bloco"+x+y);
+
+    // && !bloco.classList.contains("vidas") && !bloco.classList.contains("buraco") && !bloco.classList.contains("vida-icon") && !bloco.classList.contains("carro") && !bloco.classList.contains("marrom") && !bloco.classList.contains("preto") && !bloco.classList.contains("amarelo") && !bloco.classList.contains("vermelho") && !bloco.classList.contains("jogador")
+
+
+    if (!bloco.classList.contains("jogador") && !bloco.classList.contains("azul") && !bloco.classList.contains("preto") && !bloco.classList.contains("marrom") && !bloco.classList.contains("verde") )
+    {
+        bloco.classList.remove("cinza", "verde", "amarelo");
+        bloco.classList.add("buraco", "buraco-icon");
+    }
+}
+setInterval(buracoNoChao, tempoBuraco);
+
+
+// function telaFinal() {
+
+//     let tela = document.querySelector(".tela");
+//     tela.innerHTML = `<div class="conteudo-tela-final">
+//                         <h2>Parabéns! Você venceu o jogo!</h2>
+//                         <p>Vitórias: ${vitorias}</p>
+//                         <button id="fechar-tela-final">Fechar</button>
+//                         </div>`;
+//     const botaoFechar = document.getElementById("fechar-tela-final");
+//     botaoFechar.addEventListener("click", () => {
+//         tela.style.display = "none";
+//     });
+//     tela.style.display = "flex";
+// }
