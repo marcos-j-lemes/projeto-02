@@ -37,32 +37,55 @@
     color: white;
 }
 
+ /* bloco da vitoria */
 .verde {
-    background-color: green;
-    border: 1px solid transparent;
-    color: green;
+    background: linear-gradient(
+        180deg,
+        #2ecc71,
+        #1e8449
+    );
 }
+
 .cinza {
     background-color: lightgray;
     border: 1px solid lightgray;
     color: lightgray;
 }
 
+/* estradas */
 .preto {
-    background-color: black;
+    background-color: #333;
     border: 1px solid transparent;
 }
+
+/* Estradas com linhas */
+.preto::before{
+    content: "--";
+    color: white;
+    width: 60%;
+    height: 1px;
+    background: yellow;
+    opacity: 0.4;
+    border-radius: 3px;
+    display: block;
+    margin: 20% auto 0 auto;
+}
+
 
 .vermelho {
+    animation: hit 0.5s ease-in-out 2;
     background-color: red;
     border: 1px solid transparent;
-    color: yellow;
+    color: red;
 }
 
-.marrom {
-    background-color: brown;
-    border: 1px solid transparent;
-    color: brown;
+/* animação de hit */
+@keyframes hit {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-3px); }
+    50% { transform: translateX(3px); }
+    75% { transform: translateX(-3px); }
+    100% { transform: translateX(0); }
 }
 
 .cinza:hover {
@@ -99,12 +122,99 @@
     border-right: 1px solid red;
 }
 
+/* Carro emoji */
 .carro::before {
     content: "🚓";
     font-size: 40px;
 }
 
+.ambiente {
+    background-color: #333;
+}
+
+/* Estilos gerais */ 
+body {
+    background: radial-gradient(circle at top, #1b1f24, #0e1013);
+    font-family: "Segoe UI", Tahoma, sans-serif;
+}
 
 .ambiente {
+    margin: 30px auto;
+    padding: 10px;
+    border-radius: 12px;
+    box-shadow: 
+        0 0 0 3px #222,
+        0 10px 30px rgba(0,0,0,0.6);
+}
+
+.bloco {
+    border-radius: 5px;
+}
+
+.azul {
+    background: linear-gradient(
+        180deg,
+        #1e90ff,
+        #0066cc
+    );
+    box-shadow: inset 0 0 5px rgba(255,255,255,0.2);
+}
+/* balsas */
+.marrom {
+    background-color: brown;
+    border: 1px solid transparent;
+    color: brown;
+    box-shadow: inset 0 0 5px rgba(255,255,255,0.2);
+}
+
+#vidas {
+    color: white;
+
+}
+
+.carro::before {
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.6));
+}
+
+.life {
+  font-family: 'Courier New', Courier, monospace; 
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#vidas {
+  color: red;
+  letter-spacing: 2px; 
+  text-shadow: 1px 1px 0px #000;
+}
+
+.vida-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.vida-icon:before {
+    content: "❤️";
+    font-size: 40px;
+}
+
+.score {
+    font-family: 'Courier New', Courier, monospace; /* Estilo retrô */
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background-color: rgba(21, 191, 15, 0.3);
+    padding: 5px 10px;
+    border-radius: 10px;
+}
+
+.buraco {
     background-color: black;
+    border: 1px solid transparent;
 }
