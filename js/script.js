@@ -349,8 +349,9 @@ function winGame()
 
     if (blocoWin.classList.contains("jogador"))
     {
-        //alert("Parabéns! Você venceu o jogo!");
-        telaFinal();
+        alert("Parabéns! Você venceu o jogo!");
+        // correção de erro;
+        //telaFinal();
         // Reinicia o jogo
         vitorias++;
         let ambiente = document.querySelector(".ambiente");
