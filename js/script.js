@@ -5,13 +5,13 @@ const gridSizeY = 10;
 var posicaoX = 9;
 var posicaoY = 4;
 
-var vidas = 3;
-
-var rios = [ 1, 3, 6, 8];
+var rios = [ 1, 3, 8];
 var balsa = [ 2, 4, 6, 8 ];
 var direcao = [ 1, -1, 1, -1 ];
 
-
+var estradas  = [6,5]; 
+var carros = [1,5];
+var direcaoCarros = [1];
 
 function setDefaults()
 {
@@ -25,6 +25,8 @@ document.addEventListener('DOMContentLoaded', inicializaJogo);
 document.addEventListener('keydown', processaTecla);
 
 // Funções:
+
+
 
 function removeVida()
 {
@@ -42,6 +44,15 @@ function removeVida()
         atualizaVidas();
     }
 }
+function definirDirecao(elemento, direcao) {
+    elemento.classList.remove(
+        "dir-cima",
+        "dir-direita",
+        "dir-baixo",
+        "dir-esquerda"
+    );
+    elemento.classList.add(direcao);
+}
 
 function processaTecla(evento)
 {
@@ -50,12 +61,15 @@ function processaTecla(evento)
 
     if (evento.key == "ArrowDown")
     {
+        definirDirecao(atual, "dir-baixo");
         let novaPosicao = document.querySelector("#bloco"+(posicaoX+1)+posicaoY);
         if (posicaoX < (gridSizeX-1) && !novaPosicao.classList.contains("azul"))
         {
             atual.classList.remove("jogador");
             novaPosicao.classList.add("jogador");
+            definirDirecao(novaPosicao, "dir-baixo");
             posicaoX += 1;
+           // winGame();
         }
         else
         {
@@ -65,12 +79,15 @@ function processaTecla(evento)
     }
     else if (evento.key == "ArrowRight")
     {
+        definirDirecao(atual, "dir-direita");
         let novaPosicao = document.querySelector("#bloco"+posicaoX+(posicaoY+1));
         if (posicaoY < (gridSizeY-1) && !novaPosicao.classList.contains("azul"))
         {
             atual.classList.remove("jogador");
             novaPosicao.classList.add("jogador");
+            definirDirecao(novaPosicao, "dir-direita");
             posicaoY += 1;
+           //winGame();
         }
         else
         {
@@ -80,29 +97,33 @@ function processaTecla(evento)
     }
     else if (evento.key == "ArrowUp")
     {
+        definirDirecao(atual, "dir-cima");
         let novaPosicao = document.querySelector("#bloco"+(posicaoX-1)+posicaoY);
-        // Posso ir para a nova posição?
         if (posicaoX > 0 && !novaPosicao.classList.contains("azul"))
         {
             atual.classList.remove("jogador");
             novaPosicao.classList.add("jogador");
+            definirDirecao(novaPosicao, "dir-cima");
             posicaoX -= 1;
+           // winGame();
         }
         else
         {
             atual.classList.add("vermelho");
             removeVida();
         }
-
     }
     else if (evento.key == "ArrowLeft")
     {
+        definirDirecao(atual, "dir-esquerda");
         let novaPosicao = document.querySelector("#bloco"+posicaoX+(posicaoY-1));
         if (posicaoY > 0 && !novaPosicao.classList.contains("azul"))
         {
             atual.classList.remove("jogador");
             novaPosicao.classList.add("jogador");
+            definirDirecao(novaPosicao, "dir-esquerda");
             posicaoY -= 1;
+            //winGame();
         }
         else
         {
@@ -110,9 +131,9 @@ function processaTecla(evento)
             removeVida();
         }
     }
-    else
-    {
-        alert(evento.key);
+
+    if (posicaoX == 0 && posicaoY == Math.floor(gridSizeY/2)){
+        winGame();
     }
 }
 
@@ -123,14 +144,14 @@ function atualizaVidas()
 }
 
 function inicializaJogo()
-{
+{  
     setDefaults();
     criaGrid();
-
+    
     // Criar jogador
     let jogador = document.querySelector("#bloco"+posicaoX+posicaoY);
     jogador.classList.add("jogador");
-
+    
     // Criar rios
     rios.forEach((rio, cont_rio) => {
         for(let i = 0; i < gridSizeY; i++)
@@ -144,7 +165,22 @@ function inicializaJogo()
         }
     });
 
+    // Criar estradas
+    estradas.forEach((estrada, cont_estrada) => {
+        for(let i = 0; i < gridSizeY; i++)
+        {
+            let elem = document.querySelector("#bloco"+estrada+i);
+            elem.classList.remove("cinza");
+            if (carros[cont_estrada] == i)
+                elem.classList.add("carro");
+            else
+                elem.classList.add("preto");
+        }
+    });
+
     atualizaVidas();
+    winGame();
+
 }
 
 function criaGrid()
@@ -206,17 +242,78 @@ function movimentaBalsas()
         }
         let balsaNova = document.querySelector("#bloco"+rio+(balsa[index]));
 
-        balsaAtual.classList.remove("amarelo");
+        balsaAtual.classList.remove("marrom");
         balsaAtual.classList.add("azul");
 
-        if (balsaAtual.classList.contains("jogador")){
+        // fixa o jogador em cima da balsa;
+        if (balsaAtual.classList.contains("jogador") || atual == balsaAtual)
+        {
             balsaAtual.classList.remove("jogador");
-            balsaNova.classList.add("jogador");
-            
-        }else if (!balsaAtual.classList.contains(jogador) && !balsaAtual.classList("jogador") ){
-            atual.classList.remove("jogador")    
+            posicaoX = rio;
+            posicaoY = balsa[index];
+            atual = balsaNova;
+            atual.classList.add("jogador");
         }
+
         balsaNova.classList.remove("azul");
-        balsaNova.classList.add("amarelo");
+        balsaNova.classList.add("marrom");
+    });
+
+    // Remover a lógica de movimento das balsas para as estradas
+    estradas.forEach((estrada, index) => {
+        let carroAtual = document.querySelector("#bloco"+estrada+carros[index]);
+        if (direcaoCarros[index] == 1)
+        {
+            carros[index] += 1;
+            if (carros[index] == gridSizeY-1)
+                direcaoCarros[index] = -1;
+        }
+        else
+        {
+            carros[index] -= 1;
+            if (carros[index] == 0)
+                direcaoCarros[index] = 1;
+        }
+        let carroNovo = document.querySelector("#bloco"+estrada+(carros[index]));
+
+        carroAtual.classList.remove("carro");
+        carroAtual.classList.add("preto");
+
+        // verifica se o jogador está na posição do carro
+        if (carroAtual.classList.contains("jogador") || atual == carroAtual)
+        {
+            carroAtual.classList.remove("jogador");
+            carroAtual.classList.add("vermelho"); // Adiciona a classe vermelha
+            removeVida();
+            // Volta o jogador uma casa
+            if (posicaoX > 0) {
+                let blocoAnterior = document.querySelector("#bloco"+(posicaoX-1)+posicaoY);
+                blocoAnterior.classList.add("jogador");
+                posicaoX -= 1;
+            }
+        }
+        carroNovo.classList.remove("preto");
+        carroNovo.classList.add("carro");
     });
 }
+
+
+function winGame()
+{
+    let blocoWin = document.querySelector("#bloco0"+Math.floor(gridSizeY/2));
+
+   // console.log("Verificando vitória na posição: ", blocoWin);
+   // blocoWin.classList.add("top");
+    blocoWin.classList.remove("cinza");
+    blocoWin.classList.add("verde");
+
+    if (blocoWin.classList.contains("jogador"))
+    {
+        alert("Parabéns! Você venceu o jogo!");
+        // Reinicia o jogo
+        let ambiente = document.querySelector(".ambiente");
+        ambiente.innerHTML = "";
+        inicializaJogo();
+    }
+}
+
