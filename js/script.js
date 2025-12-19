@@ -1,4 +1,5 @@
 // Variáveis Globais:
+const spanVidas = document.getElementById('vidas');
 const gridSizeX = 10;
 const gridSizeY = 10;
 
@@ -11,22 +12,40 @@ var direcao = [ 1, -1, 1, -1 ];
 
 var estradas  = [6,5]; 
 var carros = [1,5];
-var direcaoCarros = [1];
+var direcaoCarros = [1, -1];
+
+var a = false;
+let vidas = 10;
+let loopBalsas;
+
+
+function iniciarLoop() {
+    clearInterval(loopBalsas);
+    loopBalsas = setInterval(movimentaBalsas, tempo);
+}
+
 
 function setDefaults()
 {
     posicaoX = 9;
     posicaoY = 4;
-    vidas = 3;
+    //vidas = 3;
+    
+    if ( vidas <= 1 ){
+        vidas = 3;
+    }
 }
+
+
+let vitorias = 0;
+let tempo = 250;
+
 
 // Registro de eventos:
 document.addEventListener('DOMContentLoaded', inicializaJogo);
 document.addEventListener('keydown', processaTecla);
 
 // Funções:
-
-
 
 function removeVida()
 {
@@ -44,6 +63,9 @@ function removeVida()
         atualizaVidas();
     }
 }
+
+
+
 function definirDirecao(elemento, direcao) {
     elemento.classList.remove(
         "dir-cima",
@@ -56,6 +78,8 @@ function definirDirecao(elemento, direcao) {
 
 function processaTecla(evento)
 {
+ 
+
     let atual = document.querySelector("#bloco"+posicaoX+posicaoY);
     atual.classList.remove("vermelho");
 
@@ -88,6 +112,7 @@ function processaTecla(evento)
             definirDirecao(novaPosicao, "dir-direita");
             posicaoY += 1;
            //winGame();
+
         }
         else
         {
@@ -132,6 +157,18 @@ function processaTecla(evento)
         }
     }
 
+    
+    if ( a == false ){
+        sorteiaCoracao();
+        a = true;
+    }
+    
+    if (a == true){
+        pegarCoracao();
+
+    }
+
+
     if (posicaoX == 0 && posicaoY == Math.floor(gridSizeY/2)){
         winGame();
     }
@@ -139,12 +176,19 @@ function processaTecla(evento)
 
 function atualizaVidas()
 {
-    let spanVidas = document.querySelector("#vidas");
-    spanVidas.innerText = vidas;
+    spanVidas.innerText = "❤️".repeat(vidas);
+   // let spanVidas = document.querySelector("#vidas");
+    //spanVidas.innerText = vidas;
 }
 
 function inicializaJogo()
 {  
+
+    vitoriasGame();
+    let am = document.querySelector(".ambiente");
+    am.innerHTML = "";
+
+    a = false;
     setDefaults();
     criaGrid();
     
@@ -219,11 +263,12 @@ function criaGrid()
     }
 }
 
-setInterval(movimentaBalsas, 1000);
+iniciarLoop();
+//setInterval(movimentaBalsas, tempo);
+//setInterval(movimentaBalsas, 1000);
 
 function movimentaBalsas()
 {
-
     let atual = document.querySelector("#bloco"+posicaoX+posicaoY);
 
     rios.forEach((rio, index) => {
@@ -250,7 +295,9 @@ function movimentaBalsas()
         {
             balsaAtual.classList.remove("jogador");
             posicaoX = rio;
-            posicaoY = balsa[index];
+            if ( atual === balsaAtual ){
+                posicaoY = balsa[index];
+            }
             atual = balsaNova;
             atual.classList.add("jogador");
         }
@@ -311,9 +358,62 @@ function winGame()
     {
         alert("Parabéns! Você venceu o jogo!");
         // Reinicia o jogo
+        vitorias++;
         let ambiente = document.querySelector(".ambiente");
         ambiente.innerHTML = "";
         inicializaJogo();
     }
+
+    if (vitorias % 3 == 0 && tempo > 10)
+    {
+        tempo -= 50; // Aumenta a velocidade do jogo a cada 3 vitórias
+    }else if (vitorias == 5){
+        vidas = 1
+    };
+
+    console.log("Vitórias: ", vitorias, " Tempo: ", tempo);
 }
 
+
+// função para sortear um coração pelo mapa:
+function sorteiaCoracao()
+{
+    let x = Math.floor(Math.random() * gridSizeX);
+    let y = Math.floor(Math.random() * gridSizeY);
+    let bloco = document.querySelector("#bloco"+x+y);
+    if (!bloco.classList.contains("jogador") && !bloco.classList.contains("azul") && !bloco.classList.contains("preto") && !bloco.classList.contains("marrom"))
+    {
+        bloco.classList.remove("cinza", "verde", "amarelo");
+        bloco.classList.add("vidas", "vida-icon");
+        //  setTimeout(() => {
+        //     bloco.classList.remove("vidas");
+        //     bloco.classList.remove("vida-icon");
+        // }, 5000); // Remove o coração após 5 segundos
+
+    }
+}
+
+function pegarCoracao()
+{
+    let blocoVidas = document.querySelector(".vidas");
+    if (blocoVidas && blocoVidas.classList.contains("jogador"))
+    {
+        vidas++;   
+        atualizaVidas();
+        blocoVidas.classList.remove("vidas");
+        console.log("Coração coletado! Vidas: ", vidas);
+
+        // remover o coração 
+        blocoVidas.classList.remove("vida-icon");
+        blocoVidas.classList.add("cinza");
+        a = false;
+    }
+}
+
+//setInterval(sorteiaCoracao, 5000); // Sorteia um coração a cada 10 segundos
+
+function vitoriasGame(){
+    let spanVitorias = document.getElementById('vitorias');
+    spanVitorias.innerText = "🏆".repeat(vitorias);
+
+}
