@@ -10,8 +10,25 @@
     line-height: 300%;
 }
 
-.jogador{
+.jogador {
     background-image: url("../img/sapo.png");
+}
+
+/* mover em direção */
+.dir-cima {
+    transform: rotate(0deg);
+}
+
+.dir-direita {
+    transform: rotate(90deg);
+}
+
+.dir-baixo {
+    transform: rotate(180deg);
+}
+
+.dir-esquerda {
+    transform: rotate(270deg);
 }
 
 .azul {
@@ -23,7 +40,7 @@
 .verde {
     background-color: green;
     border: 1px solid transparent;
-    color: gr;
+    color: green;
 }
 .cinza {
     background-color: lightgray;
@@ -31,10 +48,21 @@
     color: lightgray;
 }
 
+.preto {
+    background-color: black;
+    border: 1px solid transparent;
+}
+
 .vermelho {
     background-color: red;
     border: 1px solid transparent;
     color: yellow;
+}
+
+.marrom {
+    background-color: brown;
+    border: 1px solid transparent;
+    color: brown;
 }
 
 .cinza:hover {
@@ -53,6 +81,12 @@
     border-top: 1px solid red;
 }
 
+.carro {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .bottom {
     border-bottom: 1px solid red;
 }
@@ -63,4 +97,14 @@
 
 .right {
     border-right: 1px solid red;
+}
+
+.carro::before {
+    content: "🚓";
+    font-size: 40px;
+}
+
+
+.ambiente {
+    background-color: black;
 }
